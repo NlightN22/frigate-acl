@@ -9,8 +9,8 @@ You can also set the birdseye role to define user access through the role.
 I created proxy-server witch modify answers from frigate API. 
 And that is the reason for set frigate server to private localhost (127.0.0.1) and must be closed from external connections!
 I don't want to modify frigate backend and frontend too much, and i added only two pages on frontend.
-I can't make normal build for frontend, because vite builder had too much modifications, and it not work correctly. 
-And the one more reason to not use builder - frigate production version work on docker with root rights, like node.
+I can't make normal build for frontend, because vite builder had too much modifications, and it does not work correctly. 
+And the one more reason to not use builder - frigate production version works on docker with root rights, like node.
 I mainly use nestjs, mongodb, mongo-express. Mongo-express is optional
 
 
