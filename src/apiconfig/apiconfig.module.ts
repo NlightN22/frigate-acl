@@ -2,9 +2,9 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ApiconfigService } from './apiconfig.service';
 import { ApiconfigController } from './apiconfig.controller';
-import { ServersModule } from 'src/servers/servers.module';
-import { CamerasModule } from 'src/cameras/cameras.module';
-import { RolesModule } from 'src/roles/roles.module';
+import { ServersModule } from '../servers/servers.module';
+import { CamerasModule } from '../cameras/cameras.module';
+import { RolesModule } from '../roles/roles.module';
 
 @Module({
     imports: [

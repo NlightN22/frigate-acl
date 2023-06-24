@@ -1,9 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Server } from './server.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Error, Model } from 'mongoose';
-import { GetServerDto } from './server.dto';
-import { Camera } from 'src/cameras/camera.schema';
+import { Model } from 'mongoose';
+import { Camera } from '../cameras/camera.schema';
 
 @Injectable()
 export class ServersService {

@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { getJWTRoles } from 'src/utils/jwt.token';
+import { getJWTRoles } from '../../utils/jwt.token';
 
 @Injectable()
 export class AdminGuard implements CanActivate {

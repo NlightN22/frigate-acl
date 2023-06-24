@@ -3,7 +3,6 @@ import { RolesService } from './roles.service';
 import { RolesController } from './roles.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Role, RoleSchema } from './role.schema';
-import { CameraSchema } from 'src/cameras/camera.schema';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({

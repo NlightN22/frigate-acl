@@ -1,14 +1,11 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { IsJWT, IsPositive, IsString, IsUrl } from 'class-validator';
-import { setDefaultResultOrder } from 'dns';
-import { urlencoded } from 'express';
-import { verifyJWT } from 'src/utils/jwt.token';
 import { Role } from './role.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CamerasService } from 'src/cameras/cameras.service';
-import { birdseyeRole } from './built-in.roles';
+import { ConfigService } from '@nestjs/config';
+import { verifyJWT } from '../utils/jwt.token';
 
 
 class Authenticate {
@@ -27,55 +24,51 @@ class Authenticate {
 @Injectable()
 export class RolesService {
 
-    @IsUrl()
-    private authServer = 'https://oauth.komponent-m.ru:8443/'
-    private request = {
-        client_id: 'frigate-cli',
-        username: 'frigate-admin@komponent-m.ru',
-        password: 'aXYNm2jD',
-        grant_type: 'password',
-        client_secret: 'uCs4L5wtZBecGbMq7a2jebmB7sN9ZVsn'
-    }
-
-
-    private authenticate: Authenticate
+    private authenticate?: Authenticate
+    private updateTime = 5000
+    private sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     private readonly logger = new Logger(RolesService.name)
 
     constructor(
         @InjectModel(Role.name) private readonly roleModel: Model<Role>,
         private readonly httpService: HttpService,
+        private readonly configService: ConfigService,
     ) {
         this.updateAllRoles()
     }
-
 
     async findAll() {
         return this.roleModel.find().exec()
     }
 
-    async findOne(id: string) {
-        return await this.roleModel.findById(id)
+    async findOne(authid: string) {
+        return await this.roleModel.find({authid}).exec()
     }
 
     async findByName(name: string) {
-        return await this.roleModel.findOne({name: name}).exec()
+        return await this.roleModel.findOne({ name: name }).exec()
     }
 
     private async updateAllRoles() {
-        if (!this.authenticate) await this.fetchAccessToken()
-        if (this.authenticate.access_token) {
-            if (verifyJWT(this.authenticate.access_token)) {
-                const data = await this.fetchRoles(this.authenticate.access_token)
-                const roles: Role[] = this.parseInputDto(data)
-                this.updateRolesDB(roles)
-            } else if (verifyJWT(this.authenticate.refresh_token)) {
-                this.logger.log(this.authenticate.refresh_token)
-                // TODO add update refresh token
-                this.fetchAccessToken()
-            } else {
-                this.fetchAccessToken()
+        while (true) {
+            if (!this.authenticate) await this.fetchAccessToken()
+            if (this.authenticate?.access_token) {
+                if (verifyJWT(this.authenticate.access_token)) {
+                    const data = await this.fetchRoles(this.authenticate.access_token)
+                    if (data) {
+                        const roles: Role[] = this.parseInputDto(data)
+                        this.updateRolesDB(roles)
+                    }
+                } else if (verifyJWT(this.authenticate.refresh_token)) {
+                    this.logger.debug(this.authenticate.refresh_token)
+                    // TODO add update refresh token
+                    this.fetchAccessToken()
+                } else {
+                    this.fetchAccessToken()
+                }
             }
+            await this.sleep(this.updateTime)
         }
     }
 
@@ -83,18 +76,25 @@ export class RolesService {
         let roles: Role[] = []
         if (data) {
             data.map(role => {
-                roles.push({ authId: role.id, name: role.name,})
+                roles.push({ authId: role.id, name: role.name, })
             })
         }
         return roles
     }
 
     private async fetchAccessToken() {
-        const authPath = '/realms/frigate-realm/protocol/openid-connect/token'
-        const url = this.authServer + authPath
-        const req = new URLSearchParams(this.request).toString()
-        if (req) {
-            const data = await this.httpService.axiosRef.post(url, req)
+        const authPath = '/protocol/openid-connect/token'
+        const url = this.configService.get<string>('AUTH_REALM_PATH') + authPath
+        const request = {
+            client_id: this.configService.get<string>('AUTH_CLIENT_ID') || '',
+            username: this.configService.get<string>('AUTH_CLIENT_USERNAME') || '',
+            password: this.configService.get<string>('AUTH_CLIENT_PASSWORD') || '',
+            grant_type: 'password',
+            client_secret: this.configService.get<string>('AUTH_CLIENT_SECRET') || ''
+        }
+        const reqXHTML = new URLSearchParams(request).toString()
+        if (reqXHTML) {
+            const data = await this.httpService.axiosRef.post(url, reqXHTML)
                 .then(res => {
                     this.authenticate = res.data as Authenticate
                 })
@@ -106,13 +106,16 @@ export class RolesService {
 
     private async fetchRoles(token: string) {
         const rolesPath = '/admin/realms/frigate-realm/roles'
-        const url = this.authServer + rolesPath
+        const hostURL = new URL(this.configService.get<string>('AUTH_REALM_PATH') || '')
+        const url = hostURL.protocol + '//' + hostURL.host + rolesPath
         const data = await this.httpService.axiosRef.get(url, {
             headers: { Authorization: `Bearer ${token}` }
         }).then(res => {
             return res.data
         }).catch((e) => {
             this.logger.error(e)
+            this.authenticate = undefined
+            return null
         })
         return data
     }
@@ -121,7 +124,7 @@ export class RolesService {
         roles.map(role => {
             this.createOrUpdate(role)
         })
-        this.dropNonExisting(roles)
+        if (roles) this.dropNonExisting(roles)
     }
 
     private async createOrUpdate(role: Role) {
@@ -131,13 +134,13 @@ export class RolesService {
             upsert: true // Make this update into an upsert
         })
         return updatedCamera
-    } 
+    }
 
     private async dropNonExisting(roles: Role[]) {
         try {
             const rolesID: string[] = roles.map(role => role.authId)
             const { deletedCount } = await this.roleModel.find({ authId: { $nin: rolesID } }).deleteMany().exec()
-            this.logger.log(`Delete non existing roles: ${deletedCount}`)
+            if (deletedCount !== 0) this.logger.log(`Delete non existing roles: ${deletedCount}`)
         } catch (e) {
             this.logger.error(e)
         }

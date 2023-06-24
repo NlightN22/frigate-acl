@@ -1,9 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { EVENTS_PATH } from 'src/api.path';
-import { CamerasService } from 'src/cameras/cameras.service';
-import { jwtRoleMock } from 'src/test/user.jwt.mock';
+import { CamerasService } from '../cameras/cameras.service';
+import { EVENTS_PATH } from '../api.path';
 
 @Injectable()
 export class ApieventsService {
@@ -15,12 +14,11 @@ export class ApieventsService {
         private readonly cameraService: CamerasService,
     ) { }
 
-    async findAll(params) {
+    async findAll(params, jwtRoles: string[]) {
         let res = ''
         const server =  this.configService.get<string>('FRIGATE_LOCAL_SERVER')
-        const roles = jwtRoleMock.realm_access.roles // todo change to jwt roles
-        if (server) {
-            await this.handleRequestParams(params, roles)
+        if (server && jwtRoles) {
+            await this.handleRequestParams(params, jwtRoles)
             const data = await this.fetchServerEvents(server, params)
             return data
         }
@@ -31,7 +29,7 @@ export class ApieventsService {
         const allowedCameras = await this.cameraService.findByRoles(roles)
         const allowedCamerasNames = allowedCameras.map(camera => camera.name)
 
-        if (params.cameras.includes('all')) {
+        if (params.cameras && params.cameras.includes('all')) {
             params.cameras = allowedCamerasNames.join(",")
         }
         return params

@@ -31,19 +31,17 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ConfigService],
 })
 
 export class AppModule implements NestModule {
+
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(ProxyMiddleware)
       .exclude(
-        '/', 'acl/(.*)', 'auth/(.*)', CONFIG_PATH, EVENTS_PATH
+        '/', 'acl/*', 'auth/*', CONFIG_PATH, EVENTS_PATH
       )
-      // .forRoutes({ path: '*', method: RequestMethod.ALL})
-      .forRoutes('live/(.*)', 'api/(.*)')
+      .forRoutes('live/*', 'api/*', '//api/*', '//live/*', '/vod/*', '/ws*')
   }
 }
-
-// export class AppModule {}

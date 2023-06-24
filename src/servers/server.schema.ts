@@ -1,9 +1,6 @@
-import { Logger } from "@nestjs/common";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsString, IsUrl } from "class-validator";
-import { HydratedDocument, Model } from "mongoose";
-import { Camera } from "src/cameras/camera.schema";
-import { CamerasService } from "src/cameras/cameras.service";
+import { HydratedDocument } from "mongoose";
 
 export type ServerDocument = HydratedDocument<Server>
 

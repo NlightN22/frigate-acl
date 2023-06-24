@@ -3,7 +3,7 @@ import { ServersController } from './servers.controller';
 import { ServersService } from './servers.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServerSchema } from './server.schema';
-import { CamerasModule } from 'src/cameras/cameras.module';
+import { CamerasModule } from '../cameras/cameras.module';
 
 @Module({
     imports: [

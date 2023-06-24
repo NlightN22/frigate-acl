@@ -3,7 +3,7 @@ import { CamerasService } from './cameras.service';
 import { CamerasController } from './cameras.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Camera, CameraSchema } from './camera.schema';
-import { RolesModule } from 'src/roles/roles.module';
+import { RolesModule } from '../roles/roles.module';
 
 @Module({
   imports: [

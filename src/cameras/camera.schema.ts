@@ -1,7 +1,4 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose from "mongoose";
-import { Role } from "src/roles/role.schema";
-import { Server } from "src/servers/server.schema";
 
 @Schema()
 export class Camera {
@@ -11,7 +8,7 @@ export class Camera {
     @Prop()
     server: string
 
-    @Prop({type: [{ type: mongoose.Schema.Types.ObjectId, ref: Role.name}] })
-    accessRoles: Role[]
+    @Prop()
+    accessRoles: string[]
 }
 export const CameraSchema = SchemaFactory.createForClass(Camera)

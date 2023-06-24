@@ -6,7 +6,7 @@ export class UserGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean {
     const req = context.switchToHttp().getRequest();
-    return req.session.user !== undefined;
+    return req.session !== undefined;
   }
 }
 

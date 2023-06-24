@@ -1,17 +1,18 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import { ServersService } from 'src/servers/servers.service';
 import { CONFIG_PATH } from '../api.path';
-import { objForEach } from 'src/utils/parseojects';
 import { isString } from 'class-validator';
-import { CamerasService } from 'src/cameras/cameras.service';
-import { RolesService } from 'src/roles/roles.service';
 import { ConfigService } from '@nestjs/config';
-import { jwtRoleMock } from 'src/test/user.jwt.mock';
+import { CamerasService } from '../cameras/cameras.service';
+import { RolesService } from '../roles/roles.service';
+import { objForEach } from '../utils/parseojects';
 
 @Injectable()
 export class ApiconfigService {
     private readonly logger = new Logger(ApiconfigService.name)
+
+    private updateTime = 5000
+    private sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     constructor(
         private readonly configService: ConfigService,
@@ -22,13 +23,12 @@ export class ApiconfigService {
         this.updateServerConfig()
     }
 
-    async findAll() {
+    async findAll(jwtRoles: string[]) {
         let res = ''
         const server = this.configService.get<string>('FRIGATE_LOCAL_SERVER')
-        const roles = jwtRoleMock.realm_access.roles // todo change to jwt roles
-        if (server) {
+        if (server && jwtRoles) {
             const data = await this.fetchServerConfig(server)
-            return this.handleServerConfig(data, roles)
+            return this.handleServerConfig(data, jwtRoles)
         }
         return res
     }
@@ -92,17 +92,20 @@ export class ApiconfigService {
 
     private async updateServerConfig() {
         const server = this.configService.get<string>('FRIGATE_LOCAL_SERVER')
+        while (true) {
         if (server) {
             const data = await this.fetchServerConfig(server)
             if (data) {
                 const cameras: any[] = data.cameras
                 const camerasNames = this.parseCamerasNames(cameras)
-                this.logger.log(`From server ${server} get next cameras:\n\t${camerasNames.join('\n\t')}`)
+                // this.logger.log(`From server ${server} get next cameras:\n\t${camerasNames.join('\n\t')}`)
                 if (camerasNames) {
                     this.updateCameras(server, camerasNames)
                 }
             }
         }
+        await this.sleep(this.updateTime)
+    }
     }
 
     private async fetchServerConfig(server: string) {
@@ -131,6 +134,7 @@ export class ApiconfigService {
             this.cameraService.createOrUpdate(server, name)
         })
         this.cameraService.dropNonExisting(server, camerasNames)
+        this.cameraService.dropNonExistingRoles()
     }
 
 }

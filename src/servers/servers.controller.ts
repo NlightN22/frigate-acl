@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { Server } from './server.schema';
 import { ServersService } from './servers.service';
-import { FindIdParams } from 'src/common/FindIdParams';
-import { BASE_API_URL } from 'src/baseurl.const';
+import { BASE_API_URL } from '../baseurl.const';
+import { FindIdParams } from '../common/find.id.params';
 
 @Controller(`${BASE_API_URL}servers`)
 export class ServersController {

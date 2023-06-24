@@ -1,5 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ApiconfigController } from './apiconfig.controller';
+import { Test, TestingModule } from "@nestjs/testing";
+import { ApiconfigController } from "./apiconfig.controller";
+
 
 describe('ApiconfigController', () => {
   let controller: ApiconfigController;

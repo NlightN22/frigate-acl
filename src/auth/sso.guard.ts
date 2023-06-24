@@ -11,8 +11,9 @@ export class SSOAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
 
+    try {
     request.user = await new Promise((resolve, reject) =>
-      this.passport.authenticate('sso', (err, user) => {
+      this.passport.authenticate('sso', {successRedirect: '/'}, (err, user) => {
         try {
           return resolve(this.handleRequest(err, user));
         } catch (err) {
@@ -20,8 +21,12 @@ export class SSOAuthGuard implements CanActivate {
         }
       })(request, response)
     );
-
     return true;
+    
+    } catch (err) {
+      console.error(err)
+      return false
+    }
   }
 
   private handleRequest(err, user) {

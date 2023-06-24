@@ -1,9 +1,9 @@
-import { IsMongoId } from "class-validator"
+import { IsMongoId, IsUUID } from "class-validator"
 
 export class SetRoleDto {
     @IsMongoId()
     cameraId: string
-    @IsMongoId()
+    @IsUUID()
     accessRoleId: string
     operation: "delete" | "add"
 }
