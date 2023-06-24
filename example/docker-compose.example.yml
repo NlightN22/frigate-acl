@@ -1,0 +1,93 @@
+# rename this file to docker-compose.yml and define your settings
+version: "3.9"
+services:
+  frigate:
+    container_name: frigate
+    privileged: true # this may not be necessary for all setups
+    restart: unless-stopped
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: "7128mb" # update for your cameras based on calculation above
+    devices:
+      - /dev/bus/usb:/dev/bus/usb # passes the USB Coral, needs to be modified for other versions
+      - /dev/apex_0:/dev/apex_0 # passes a PCIe Coral, follow driver instructions here https://coral.ai/docs/m2/get-started/#2a-on-linux
+      - /dev/dri/renderD128 # for intel hwaccel, needs to be updated for your hardware
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /opt/frigate/config.yml:/config/config.yml # set your external path for frigate config
+      - /viderecords:/media/frigate # set your external path for viderecords
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "127.0.0.1:5000:5000"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    environment:
+      FRIGATE_RTSP_PASSWORD: "FRIGATE_RTSP_PASSWORD"
+      
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 127.0.0.1:27017:27017 
+    volumes:
+      - mongodbdata:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo_username
+      MONGO_INITDB_ROOT_PASSWORD: your_mongo_password
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 127.0.0.1:8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongo_username
+      ME_CONFIG_MONGODB_ADMINPASSWORD: your_mongo_password
+      ME_CONFIG_MONGODB_URL: mongodb://mongo_username:your_mongo_password@mongo:27017/
+  
+  frigate-acl:
+    image: oncharterliz/frigate-acl
+    restart: always
+    ports:
+      - 3000:3000 # public port for redirect login and logout from keycloak
+    environment:
+      MONGODB_URI: mongodb://mongo_username:your_mongo_password@mongo:27017/frigate-acl?authSource=admin
+      BIRDS_ROLE: birdseyeRole # role at keycloak server
+      ADMIN_ROLE: admin # role at keycloak server
+      SERVER_HOST: your-public.host # public host for redirect login and logout from keycloak
+      SERVER_PORT: 3000 # the same at right side of ports
+      FRIGATE_LOCAL_SERVER: http://frigate:5000 # frigate container name and port
+      FRIGATE_FROTEND_SERVER: http://your-public.host # your public ip address
+      # ---- AUTH SERVER ----
+      AUTH_CLIENT_ID: frigate-client # create client at keycloak server
+      AUTH_CLIENT_SECRET: CHANGE_TO_SECRET_FROM_KEYCLOAK # get secret from keycloak server
+      AUTH_CLIENT_USERNAME: username@usermail.com # create user at keycloak server
+      AUTH_CLIENT_PASSWORD: userpassword # set password at keycloak server
+      AUTH_REALM_PATH: https://your-keycloak-server:port/realms/frigate-realm #  after change don't forget to change redirect url and valid post logout at keycloak client
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    depends_on:
+      - mongo
+
+  frigate-frontend:
+    image: oncharterliz/frigate-frontend
+    restart: always
+    ports: 
+      - 80:5173 # public port
+    environment:
+      VITE_ACL_URL: http://your-public.host:3000 # setup public frigate proxy host and port
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    depends_on:
+      - frigate-acl
+
+volumes:
+  mongodbdata:

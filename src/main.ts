@@ -9,12 +9,12 @@ import { frontendURL, hostURL, port, wsFrontendURL } from './common/env.const';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule,)
 
-  console.debug(hostURL)
-  console.debug(frontendURL)
-  console.debug(wsFrontendURL)
+  console.debug(`hostURL: ${hostURL.toString()}`)
+  console.debug(`frontendURL: ${frontendURL.toString()}`)
+  console.debug(`wsFrontendURL: ${wsFrontendURL.toString()}`)
 
   app.enableCors({
-    origin: [hostURL, frontendURL, wsFrontendURL],
+    origin: [hostURL.toString(), frontendURL.toString(), wsFrontendURL.toString()],
     credentials: true
   })
   // app.enableCors()

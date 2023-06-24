@@ -1,0 +1,36 @@
+mqtt:
+  host: 127.0.0.1
+
+record:
+  enabled: True
+  retain:
+    days: 30
+    mode: motion
+
+
+objects:
+  track:
+    - person
+    - car
+
+ffmpeg:
+  output_args:
+    record: preset-record-generic-audio-aac
+
+cameras:
+## ----- START OFFICE CAMERAS -----  
+  it-1:
+    motion:
+      mask:
+        - 1893,0,1891,44,1322,43,1323,0
+    ffmpeg:
+      inputs:
+        - path: rtsp://username:password@cameraip:rtsp_port/main
+          roles:
+            - detect
+            - record
+    detect:
+      width: 1920
+      height: 1080
+
+  ### ----- END OFFICE CAMERAS -----  

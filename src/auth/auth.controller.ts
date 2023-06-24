@@ -60,7 +60,7 @@ export class AuthController {
         try {
             if (session) {
                 const logoutPath = '/protocol/openid-connect/logout'
-                const loginPath = hostURL + '/auth/login'
+                const loginPath = hostURL.toString() + '/auth/login'
                 const params = `?client_id=${this.clientId}&post_logout_redirect_uri=${loginPath}`
                 const url = this.authServer + logoutPath + params
                 res.redirect(302, url)
