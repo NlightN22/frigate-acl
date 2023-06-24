@@ -18,14 +18,14 @@ I mainly use nestjs, mongodb, mongo-express. Mongo-express is optional
 * Installing and configuring the keycloak authorization server
 * Create keycloak client for frigate-acl server. You can test them on https://www.keycloak.org/app/
 * Create keycloack user for frigate-acl server.
-* Grant access to the keycloack user for viewving keycloak roles. Role named - 'view-roles'
+* Grant access to the keycloack user for viewing keycloak roles. Role named - 'view-roles'
 * You can check access to the roles by post query to https://your.keycloack.server:8443/admin/realms/frigate-realm/roles. With access_token of course.
 * Create users and assing roles for them at keycloak
 * Assing admin role to admin user
 * Create folder /opt/frigate
 * Download docker-compose.example.yml from example folder to /opt/frigate
 * Download config.example.yml from example folder to /opt/frigate
-* Define your params at compose and config files. They has comments and predefined params.
+* Define your params at compose and config files. They have comments and predefined params.
 * Check compose config
 ```bash 
 docker compose config
