@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as session from 'express-session';
 import { AuthFilter } from './common/auth.filter';
-import { frontendURL, hostURL, wsFrontendURL } from './common/env.const';
+import { frontendURL, hostURL, port, wsFrontendURL } from './common/env.const';
 
 
 async function bootstrap() {
@@ -28,6 +28,6 @@ async function bootstrap() {
   )
 
   // app.useGlobalFilters(new AuthFilter()); // enable filter to autoredirect at login page every query
-  await app.listen(3000);
+  await app.listen(port);
 }
 bootstrap();
