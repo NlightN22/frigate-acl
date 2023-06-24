@@ -5,6 +5,15 @@ Based on the roles you have defined, you can grant access on the client in the A
 You can also set the birdseye role to define user access through the role.
 
 
+## How it works
+I created proxy-server witch modify answers from frigate API. 
+And that is the reason for set frigate server to private localhost (127.0.0.1) and must be closed from external connections!
+I don't want to modify frigate backend and frontend too much, and i added only two pages on frontend.
+I can't make normal build for frontend, because vite builder had too much modifications, and it not work correctly. 
+And the one more reason to not use builder - frigate production version work on docker with root rights, like node.
+I mainly use nestjs, mongodb, mongo-express. Mongo-express is optional
+
+
 ## Installation
 * Installing and configuring the keycloak authorization server
 * Create keycloak client for frigate-acl server. You can test them on https://www.keycloak.org/app/
@@ -13,11 +22,20 @@ You can also set the birdseye role to define user access through the role.
 * You can check access to the roles by post query to https://your.keycloack.server:8443/admin/realms/frigate-realm/roles. With access_token of course.
 * Create users and assing roles for them at keycloak
 * Assing admin role to admin user
-* Download docker-compose.yml
-* Create .env file and define parameters
-* Start docker compose up -d
+* Create folder /opt/frigate
+* Download docker-compose.example.yml from example folder to /opt/frigate
+* Download config.example.yml from example folder to /opt/frigate
+* Define your params at compose and config files. They has comments and predefined params.
+* Check compose config
+```bash 
+docker compose config
+``` 
+* Run containers 
+```bash
+docker compose up -d
+```
 
-## .env file
+## example of .env file to start on development mode
 ```bash
 MONGODB_URI=mongodb://username:password@localhost/db-name?authSource=admin
 BIRDS_ROLE=birdseyeRole

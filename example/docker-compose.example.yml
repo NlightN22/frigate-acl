@@ -39,6 +39,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: mongo_username
       MONGO_INITDB_ROOT_PASSWORD: your_mongo_password
 
+#  mongo-express is optional. You can delete this.
   mongo-express:
     image: mongo-express
     restart: always
