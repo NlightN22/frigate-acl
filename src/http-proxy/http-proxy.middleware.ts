@@ -1,12 +1,14 @@
 import { Injectable, Logger, NestMiddleware } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { RequestHandler, createProxyMiddleware } from "http-proxy-middleware";
+import { UserGuard } from "../common/user/user.guard";
 
 
 @Injectable()
 export class ProxyMiddleware implements NestMiddleware {
 
     private readonly logger = new Logger(ProxyMiddleware.name)
+    private readonly userGuard = new UserGuard()
     frontendURI: string
     private proxy: RequestHandler
 
@@ -30,8 +32,8 @@ export class ProxyMiddleware implements NestMiddleware {
     }
 
     use(req: any, res: any, next: (error?: any) => void) {
-        if (req.session.user === undefined) {
-            next
+        if (!this.userGuard.isValidUser(req)) {
+            next()
         }
         this.proxy(req, res, next)
     }

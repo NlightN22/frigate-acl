@@ -1,7 +1,8 @@
-import { Controller, Get, Query, Session } from '@nestjs/common';
+import { Controller, Get, Query, Session, UseGuards } from '@nestjs/common';
 import { ApieventsService } from './apievents.service';
 import { FRIGATE_API_URL } from '../baseurl.const';
 import { getJWTRoles } from '../utils/jwt.token';
+import { UserGuard } from '../common/user/user.guard';
 
 @Controller(`${FRIGATE_API_URL}events`)
 export class ApieventsController {
@@ -11,6 +12,7 @@ export class ApieventsController {
     ) { }
 
         @Get()
+        @UseGuards(UserGuard)
         findAll(@Query() params, @Session() session: any) {
             const jwtRoles = getJWTRoles(session.user?.access_token)
             return this.eventsService.findAll(params, jwtRoles)

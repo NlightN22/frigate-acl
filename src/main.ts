@@ -3,21 +3,25 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as session from 'express-session';
 import { AuthFilter } from './common/auth.filter';
-import { frontendURL, hostURL, port, wsFrontendURL } from './common/env.const';
+import { frontendURL, hostURL, mongoDbUrl, port, wsFrontendURL } from './common/env.const';
 
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule,)
 
-  console.debug(`hostURL: ${hostURL.toString()}`)
-  console.debug(`frontendURL: ${frontendURL.toString()}`)
-  console.debug(`wsFrontendURL: ${wsFrontendURL.toString()}`)
+  console.debug(`[MAIN] \thostURL: ${hostURL.toString()}`)
+  console.debug(`[MAIN] \tfrontendURL: ${frontendURL.toString()}`)
+  console.debug(`[MAIN] \twsFrontendURL: ${wsFrontendURL.toString()}`)
+  console.debug(`[MAIN] \tmongoDbUrl: ${mongoDbUrl.toString()}`)
+
+  const app = await NestFactory.create(AppModule,)
+  
+  const corsAllowed: string[] = [hostURL.toString(), frontendURL.toString(), wsFrontendURL.toString()].map(cors => cors.replace(/\/$/, '') ) 
+  console.debug(`[MAIN] CORS enabled hosts: ${corsAllowed.join(', ')}`)
 
   app.enableCors({
-    origin: [hostURL.toString(), frontendURL.toString(), wsFrontendURL.toString()],
+    origin: corsAllowed,
     credentials: true
   })
-  // app.enableCors()
   app.useGlobalPipes(new ValidationPipe())
   app.use(
     session({
@@ -28,6 +32,6 @@ async function bootstrap() {
   )
 
   // app.useGlobalFilters(new AuthFilter()); // enable filter to autoredirect at login page every query
-  await app.listen(port);
+  await app.listen(port) 
 }
 bootstrap();

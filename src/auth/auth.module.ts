@@ -4,7 +4,7 @@ import { Issuer, Strategy } from 'openid-client';
 import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as passport from 'passport';
-import { frontendURL, hostURL } from '../common/env.const';
+import { hostURL } from '../common/env.const';
 
 @Module({
     imports: [ConfigModule],
@@ -17,7 +17,7 @@ import { frontendURL, hostURL } from '../common/env.const';
           return new oneLoginIssuer.Client({
             'client_id': configService.get<string>('AUTH_CLIENT_ID') || '',
             'client_secret': configService.get<string>('AUTH_CLIENT_SECRET'),
-            'redirect_uris': [`${frontendURL.toString()}/auth/callback`],
+            'redirect_uris': [`${hostURL.toString()}auth/callback`],
             // 'redirect_uris': [configService.get<string>('FRIGATE_FROTEND_SERVER') || '/'],
             'response_types': ['code'],
           });

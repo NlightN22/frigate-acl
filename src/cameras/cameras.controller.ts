@@ -13,11 +13,13 @@ export class CamerasController {
   constructor(private readonly camerasService: CamerasService) { }
 
   @Get()
+  @UseGuards(AdminGuard)
   findAll(@Query() cameraDto: CameraDto) {
     return this.camerasService.findAll(cameraDto.role_id)
   }
 
   @Get(':id')
+  @UseGuards(AdminGuard)
   findOne(@Param() { id }: FindIdParams) {
     return this.camerasService.findOne(id);
   }

@@ -11,7 +11,7 @@ export class AdminGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean {
     const req = context.switchToHttp().getRequest();
-    const roles = getJWTRoles(req.session.user.access_token)
+    const roles = getJWTRoles(req.session.user?.access_token)
     const adminRole = this.configService.get<string>('ADMIN_ROLE')
     if (adminRole) {
       const checkAdmin = roles.includes(adminRole)
