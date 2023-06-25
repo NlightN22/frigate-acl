@@ -1,4 +1,4 @@
-import { Controller, Get, Session, UseGuards, Request, Res, Logger } from '@nestjs/common';
+import { Controller, Get, Session, UseGuards, Request, Res, Logger, Inject } from '@nestjs/common';
 import { SSOAuthGuard } from './sso.guard';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
@@ -10,12 +10,13 @@ import { hostURL } from '../common/env.const';
 @Controller('auth')
 export class AuthController {
     private readonly logger = new Logger(AuthController.name)
+    private readonly userGuard = new UserGuard()
     frontEndURI: string
     authServer: string
     clientId: string
 
     constructor(
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
     ) {
         this.logger.debug('Сreated');
         this.frontEndURI = configService.get<string>('FRIGATE_FROTEND_SERVER') || ''
@@ -51,7 +52,10 @@ export class AuthController {
 
     @Get('status')
     status(@Session() session: Record<string, any>) {
-        return session.user !== undefined
+        if (session !== undefined) {
+            return this.userGuard.isSessionValidUser(session)
+        }
+        return false
     }
 
     @Get('logout')

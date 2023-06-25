@@ -33,8 +33,9 @@ export class ProxyMiddleware implements NestMiddleware {
     }
 
     use(req: any, res: any, next: (error?: any) => void) {
-        if (!this.userGuard.isValidUser(req)) {
-            this.logger.log(`Proxy refuse request:${req?.destination}`)
+        const videoplayerCondition = req.originalUrl.startsWith('/vod/event')
+        if (!this.userGuard.isRequestValidUser(req) && !videoplayerCondition) {
+            this.logger.log(`Proxy refuse request:`)
             next()
         }
         this.proxy(req, res, next)

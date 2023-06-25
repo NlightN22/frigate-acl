@@ -7,14 +7,27 @@ export class UserGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean {
     const req = context.switchToHttp().getRequest();
-    return this.isValidUser(req)
+    return this.isRequestValidUser(req)
   }
 
-  isValidUser(req: any): boolean {
-    if (req.session.user?.access_token !== undefined)  {
-      const accessToken = req.session.user.access_token
+  isRequestValidUser(req: any): boolean {
+    if (req.session !== undefined) {
+      return this.isSessionValidUser(req.session)
+    }
+    // console.debug('request:', req)
+    // console.debug('request session:', req.session)
+
+    return false
+  }
+
+  isSessionValidUser(session: any): boolean {
+    if (session.user?.access_token !== undefined) {
+      const accessToken = session.user.access_token
+      // console.debug('accessToken', accessToken)
       return verifyJWT(accessToken)
     }
+    // console.debug('request user:', session.user)
+    // console.debug('request access_token:', session.user?.access_token)
     return false
   }
 }

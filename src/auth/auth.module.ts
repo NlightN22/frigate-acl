@@ -5,9 +5,12 @@ import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as passport from 'passport';
 import { hostURL } from '../common/env.const';
+import { UserGuard } from '../common/user/user.guard';
 
 @Module({
-    imports: [ConfigModule],
+    imports: [
+      ConfigModule,
+    ],
     providers: [
       {
         provide: CLIENT,
