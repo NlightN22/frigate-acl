@@ -2,6 +2,7 @@ import { Injectable, Logger, NestMiddleware } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { RequestHandler, createProxyMiddleware } from "http-proxy-middleware";
 import { UserGuard } from "../common/user/user.guard";
+import { frontendURL } from "../common/env.const";
 
 
 @Injectable()
@@ -16,8 +17,8 @@ export class ProxyMiddleware implements NestMiddleware {
         private readonly configService: ConfigService,
     ) {
         this.logger.debug('Created')
-        this.frontendURI = this.configService.get<string>('FRIGATE_FROTEND_SERVER') || ''
-        this.logger.debug(this.frontendURI)
+        this.frontendURI = frontendURL.toString().replace(/\/$/, '')
+        this.logger.debug(`CORS frontend URL: ${this.frontendURI}`)
         if (this.frontendURI) {
             this.proxy = createProxyMiddleware({
                 target: this.configService.get<string>('FRIGATE_LOCAL_SERVER') || '',
@@ -33,6 +34,7 @@ export class ProxyMiddleware implements NestMiddleware {
 
     use(req: any, res: any, next: (error?: any) => void) {
         if (!this.userGuard.isValidUser(req)) {
+            this.logger.log(`Proxy refuse request:${req?.destination}`)
             next()
         }
         this.proxy(req, res, next)

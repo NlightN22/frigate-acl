@@ -11,6 +11,8 @@ import { ProxyMiddleware } from './http-proxy/http-proxy.middleware';
 import { ApieventsModule } from './apievents/apievents.module';
 import { CONFIG_PATH, EVENTS_PATH } from './api.path';
 import { AuthModule } from './auth/auth.module';
+import { MonitorController } from './monitor/monitor.controller';
+import { MonitorModule } from './monitor/monitor.module';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
     RolesModule,
     ApieventsModule,
     AuthModule,
+    MonitorModule,
   ],
   controllers: [AppController],
   providers: [AppService, ConfigService],
