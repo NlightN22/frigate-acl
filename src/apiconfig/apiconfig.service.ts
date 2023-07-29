@@ -35,9 +35,9 @@ export class ApiconfigService {
 
     private async handleServerConfig(data: any, userRoles: string[]) {
         if (data) {
-
+            // this.logger.debug("User has next roles:", userRoles)
             const allowedCameras = await this.cameraService.findByRoles(userRoles)
-
+            // this.logger.debug("User has next cameras:", allowedCameras.map(camera => camera.name))
             const allowedCamerasNames = allowedCameras.map(camera => camera.name)
             let handledConfig = this.dropNonExistCameras(data, allowedCamerasNames)
             handledConfig = this.setBirdsEyeRole(handledConfig, userRoles)

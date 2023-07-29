@@ -23,8 +23,8 @@ I mainly use nestjs, mongodb, mongo-express. Mongo-express is optional
 * Create users and assing roles for them at keycloak
 * Assing admin role to admin user
 * Create folder /opt/frigate
-* Download docker-compose.example.yml from example folder to /opt/frigate
-* Download config.example.yml from example folder to /opt/frigate
+* Download docker-compose.example.yml from [example folder](https://github.com/NlightN22/frigate-acl/tree/master/example) to /opt/frigate
+* Download config.example.yml from [example folder](https://github.com/NlightN22/frigate-acl/tree/master/example) to /opt/frigate
 * Define your params at compose and config files. They have comments and predefined params.
 * Check compose config
 ```bash 
@@ -35,7 +35,7 @@ docker compose config
 docker compose up -d
 ```
 
-## example of .env file to start on development mode
+## Example of .env file to start on development mode
 ```bash
 MONGODB_URI=mongodb://username:password@localhost/db-name?authSource=admin
 BIRDS_ROLE=birdseyeRole
@@ -51,6 +51,11 @@ AUTH_CLIENT_USERNAME=keycloack-username
 AUTH_CLIENT_PASSWORD=keycloack-user-password
 AUTH_REALM_PATH=https://your.keycloack.server:8443/realms/frigate-realm
 ```
+
+### Additional for Proxmox
+If you want to use proxmox you must passing through lxc container your devices.
+Example of lxc container at [example folder](https://github.com/NlightN22/frigate-acl/tree/master/example).
+More information you can read at [frigate discussion](https://github.com/blakeblackshear/frigate/discussions/5773).
 
 ### Thanks to
 * [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
