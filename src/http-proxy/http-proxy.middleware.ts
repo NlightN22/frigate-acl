@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { RequestHandler, createProxyMiddleware } from "http-proxy-middleware";
 import { UserGuard } from "../common/user/user.guard";
 import { frontendURL } from "../common/env.const";
+import { Request } from "express";
 
 
 @Injectable()
@@ -32,9 +33,11 @@ export class ProxyMiddleware implements NestMiddleware {
         }
     }
 
-    use(req: any, res: any, next: (error?: any) => void) {
+    use(req: Request, res: any, next: (error?: any) => void) {
+        const allowedPaths = this.configService.get<string>('FRIGATE_PROXY_ALLOWED_PATH')
+        const arrAllowedPaths = allowedPaths?.split(", ").map( path => req.originalUrl.startsWith(path))
         const videoplayerCondition = req.originalUrl.startsWith('/vod/')
-        if (!this.userGuard.isRequestValidUser(req) && !videoplayerCondition) {
+        if (!this.userGuard.isRequestValidUser(req) && !videoplayerCondition && !arrAllowedPaths?.includes(true)) {
             this.logger.log(`Proxy refuse request:`)
             next()
         }

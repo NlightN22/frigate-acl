@@ -19,7 +19,7 @@ I mainly use nestjs, mongodb, mongo-express. Mongo-express is optional
 * Create keycloak client for frigate-acl server. You can test them on https://www.keycloak.org/app/
 * Create keycloack user for frigate-acl server.
 * Grant access to the keycloack user for viewing keycloak roles. Role named - 'view-roles'
-* You can check access to the roles by post query to https://your.keycloack.server:8443/admin/realms/frigate-realm/roles. With access_token of course.
+* You can check access to the roles by POST query to https://your.keycloack.server:8443/admin/realms/frigate-realm/roles. With access_token of course.
 * Create users and assing roles for them at keycloak
 * Assing admin role to admin user
 * Create folder /opt/frigate
@@ -43,8 +43,8 @@ ADMIN_ROLE=admin
 SERVER_HOST=localhost
 SERVER_PORT=3333
 FRIGATE_LOCAL_SERVER=http://localhost:5000
+FRIGATE_PROXY_ALLOWED_PATH=/api/stats, /api/version # Optional. Allows fetching any path from local frigate server. Path delimiter - ', '
 FRIGATE_FROTEND_SERVER=http://your-server-name.com:port
-
 AUTH_CLIENT_ID=keycloack-client-name
 AUTH_CLIENT_SECRET=keycloack-client-secret
 AUTH_CLIENT_USERNAME=keycloack-username

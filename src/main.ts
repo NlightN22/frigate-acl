@@ -3,15 +3,14 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as session from 'express-session';
 import { AuthFilter } from './common/auth.filter';
-import { frontendURL, hostURL, mongoDbUrl, port, wsFrontendURL } from './common/env.const';
+import { frigateLocalServer, frontendURL, hostURL, mongoDbUrl, port, wsFrontendURL } from './common/env.const';
 
 
 async function bootstrap() {
 
-  console.debug(`[MAIN] \thostURL: ${hostURL.toString()}`)
-  console.debug(`[MAIN] \tfrontendURL: ${frontendURL.toString()}`)
-  console.debug(`[MAIN] \twsFrontendURL: ${wsFrontendURL.toString()}`)
-  console.debug(`[MAIN] \tmongoDbUrl: ${mongoDbUrl.toString()}`)
+  console.debug(`[MAIN] \Server URL: ${hostURL.toString()}`)
+  console.debug(`[MAIN] \tFrontend URL: ${frontendURL.toString()}`)
+  console.debug(`[MAIN] \tFrigate server URL: ${frigateLocalServer.toString()}`)
 
   const app = await NestFactory.create(AppModule,)
   

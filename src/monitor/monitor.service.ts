@@ -15,7 +15,7 @@ export class MonitorService {
         if (data) {
             const camerasIsWorkList: any[] = []
             objForEach(data, (name , value) => {
-                console.debug(value)
+                // console.debug(value)
                 if (value.hasOwnProperty('camera_fps')) {
                     const isWork =  value.camera_fps !== 0
                     const item = {name: name, isWork: isWork}
